@@ -1,7 +1,21 @@
-import React from "react";
+import { useGlobalContext } from "helpers/hooks/useGlobalContext";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Header({ position }) {
+  const [toggleMainMenu, setToggleMainMenu] = useState(false);
+  const { state } = useGlobalContext();
+  const [isCartChanged, setCartChanged] = useState(false);
+  const prevCart = useRef(state?.cart || {});
+  useLayoutEffect(() => {
+    if (prevCart.current !== state.cart) {
+      prevCart.current = state?.cart || {};
+      setCartChanged(true);
+      setTimeout(() => {
+        setCartChanged(false);
+      }, 550);
+    }
+  }, [state.cart]);
   return (
     <header className={[position, "w-full z-50 px-4"].join(" ")}>
       <div className="container mx-auto py-10">
@@ -19,7 +33,12 @@ export default function Header({ position }) {
           <div className="w-auto">
             <ul
               id="menu"
-              className="fixed bg-white inset-0 flex flex-col invisible items-center justify-center opacity-0 md:visible md:flex-row md:bg-transparent md:relative md:opacity-100"
+              className={[
+                "fixed bg-white inset-0 flex flex-col items-center justify-center md:visible md:flex-row md:bg-transparent md:relative md:opacity-100",
+                toggleMainMenu
+                  ? "opacity-100 z-30 visible"
+                  : "invisible opacity-0",
+              ].join(" ")}
             >
               <li className="mx-3 py-6 md:py-0">
                 <Link
@@ -60,8 +79,13 @@ export default function Header({ position }) {
             <ul className="flex items-center">
               <li className="ml-6 block md:hidden">
                 <button
-                  id="menu-toggler"
-                  className="relative flex z-50 items-center justify-center w-8 h-8 text-black focus:outline-none"
+                  className={[
+                    "flex z-50 items-center justify-center w-8 h-8 text-black focus:outline-none",
+                    toggleMainMenu ? "fixed top-0 right-0" : "relative",
+                  ].join(" ")}
+                  onClick={() => {
+                    setToggleMainMenu((prev) => !prev);
+                  }}
                 >
                   <svg
                     className="fill-current"
@@ -80,7 +104,13 @@ export default function Header({ position }) {
               <li className="ml-6">
                 <Link
                   to="/cart"
-                  className="flex items-center justify-center w-8 h-8 text-black hover:text-white cart cart-filled"
+                  className={[
+                    "flex items-center justify-center w-8 h-8 text-black hover:text-white cart",
+                    state.cart && Object.keys(state.cart).length > 0
+                      ? "cart-filled"
+                      : "",
+                    isCartChanged ? "animate-bounce" : "",
+                  ].join(" ")}
                 >
                   <svg
                     className="fill-current"

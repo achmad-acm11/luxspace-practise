@@ -1,4 +1,5 @@
 import "assets/css/app.css";
+import Provider from "helpers/hooks/useGlobalContext";
 import CartPage from "pages/CartPage";
 import DetailPage from "pages/DetailPage";
 import HomePage from "pages/HomePage";
@@ -8,7 +9,8 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
+    <Provider>
+      {/* <div className="App"> */}
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage} />
@@ -18,7 +20,8 @@ function App() {
           <Route exact path="*" component={NotFoundPage} />
         </Switch>
       </Router>
-    </div>
+      {/* </div> */}
+    </Provider>
   );
 }
 

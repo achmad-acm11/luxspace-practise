@@ -1,86 +1,51 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import ReactHtmlParser from "react-html-parser";
+import { useGlobalContext } from "helpers/hooks/useGlobalContext";
 
-export default function Detail() {
+export default function Detail({ data }) {
+  const [slider, setSlider] = React.useState(() => data?.imgUrls?.[0] || "");
+
+  const { state, dispatch } = useGlobalContext();
+  console.log(state, dispatch);
   return (
     /* <!-- START: Details --> */
     <section className="container mx-auto">
       <div className="flex flex-wrap my-4 md:my-12">
         <div className="w-full md:hidden px-4">
-          <h2 className="text-5xl font-semibold">Chair Thatty</h2>
-          <span className="text-xl">IDR 12.000.000</span>
+          <h2 className="text-5xl font-semibold">{data.title}</h2>
+          <span className="text-xl">IDR {data.price}</span>
         </div>
         <div className="flex-1">
           <div className="slider">
             <div className="thumbnail">
-              {/* <!-- START: slideshow thumbnail item 1 --> */}
-              <div className="px-2">
-                <div
-                  className="item selected"
-                  data-img="/images/content/chair1.jpg"
-                >
-                  <img
-                    src="/images/content/chair1.jpg"
-                    alt="Chair Side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* <!-- END: slideshow thumbnail item 1 --> */}
-
-              {/* <!-- START: slideshow thumbnail item 2 --> */}
-              <div className="px-2">
-                <div className="item" data-img="/images/content/chair2.jpeg">
-                  <img
-                    src="/images/content/chair2.jpeg"
-                    alt="Chair Side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* <!-- END: slideshow thumbnail item 2 --> */}
-
-              {/* <!-- START: slideshow thumbnail item 3 --> */}
-              <div className="px-2">
-                <div className="item" data-img="/images/content/chair1.jpg">
-                  <img
-                    src="/images/content/chair1.jpg"
-                    alt="Chair Side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* <!-- END: slideshow thumbnail item 3 --> */}
-
-              {/* <!-- START: slideshow thumbnail item 4 --> */}
-              <div className="px-2">
-                <div className="item" data-img="/images/content/chair1.jpg">
-                  <img
-                    src="/images/content/chair1.jpg"
-                    alt="Chair Side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* <!-- END: slideshow thumbnail item 4 --> */}
-
-              {/* <!-- START: slideshow thumbnail item 5 --> */}
-              <div className="px-2">
-                <div className="item" data-img="/images/content/chair1.jpg">
-                  <img
-                    src="/images/content/chair1.jpg"
-                    alt="Chair Side"
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </div>
-              {/* <!-- END: slideshow thumbnail item 5 --> */}
+              {data?.imgUrls?.map((item) => {
+                return (
+                  <div
+                    className="px-2"
+                    key={item}
+                    onClick={() => setSlider(item)}
+                  >
+                    <div
+                      className={[
+                        "item",
+                        slider === item ? "bg-gray-100 selected" : "",
+                      ].join(" ")}
+                    >
+                      <img
+                        src={`/images/content/${item}`}
+                        alt={item}
+                        className="object-cover w-full h-full rounded-lg"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             <div className="preview">
               <div className="item rounded-lg h-full overflow-hidden">
                 <img
-                  src="/images/content/chair1.jpg"
-                  alt=""
+                  src={`/images/content/${slider}`}
+                  alt={slider}
                   className="object-cover w-full h-full rounded-lg"
                 />
               </div>
@@ -89,13 +54,18 @@ export default function Detail() {
         </div>
         <div className="flex-1 px-6 md:p-6">
           <div className="hidden md:block">
-            <h2 className="tex-5xl font-semibold">Chair Thatty</h2>
-            <p className="text-xl">IDR 12.000.000</p>
+            <h2 className="tex-5xl font-semibold">{data.title}</h2>
+            <p className="text-xl">IDR {data.price}</p>
           </div>
 
-          <Link
-            to="cart"
+          <button
             className="transition-all duration-200 bg-pink-400 text-black focus:bg-black focus:text-pink-400 rounded-full px-8 py-3 mt-4 inline-flex w-full md:w-auto justify-center"
+            onClick={() => {
+              dispatch({
+                type: "ADD_TO_CART",
+                item: data
+              })
+            }}
           >
             <svg
               className="fill-current mr-3"
@@ -112,21 +82,12 @@ export default function Detail() {
               <path d="M25.6499 4.88395C25.407 4.58083 25.0472 4.40701 24.6626 4.40701H4.82655L4.42595 2.42938C4.34232 2.01685 4.06563 1.67046 3.68565 1.50267L0.890528 0.268871C0.567841 0.126328 0.192825 0.276908 0.0528584 0.604959C-0.0872597 0.933113 0.0608116 1.31453 0.383347 1.45687L3.17852 2.69072L6.2598 17.9013C6.38117 18.5003 6.90578 18.9351 7.50723 18.9351H22.7635C23.1152 18.9351 23.4003 18.6451 23.4003 18.2875C23.4003 17.9298 23.1152 17.6399 22.7635 17.6399H7.50728L7.13247 15.7896H22.8814C23.4828 15.7896 24.0075 15.3548 24.1288 14.7558L25.9101 5.9634C25.9876 5.58054 25.8928 5.18701 25.6499 4.88395ZM22.8814 14.4945H6.87012L5.08895 5.70217L24.6626 5.70222L22.8814 14.4945Z" />
             </svg>
             Add to Chart
-          </Link>
+          </button>
 
           <hr className="my-8" />
 
           <h6 className="text-xl font-semibold mb-4">About the Product</h6>
-          <p className="text-xl leading-7 mb-6">
-            Tailored to a level of perfection synonymous with that of a Savile
-            Row suit and with understated quality in the detail, Jetty has been
-            influenced by timeless 1950s style.
-          </p>
-          <p className="text-xl leading-7 mb-6">
-            Providing a subtle nod to the past, Jetty also provides a perfect
-            solution for the way we work today. A comprehensive product family,
-            Jetty features a variety of elegant chairs and sofas.
-          </p>
+          {data.description ? ReactHtmlParser(data.description) : ""}
         </div>
       </div>
     </section>
