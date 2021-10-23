@@ -11,7 +11,7 @@ export default function SuccessPage() {
             <Breadcrumbs list={
                 [
                     {"url":"/","name":"Home"},
-                    {"url":"/","name":"Shopping Cart"}
+                    {"url":"/cart","name":"Shopping Cart"}
                 ]
             } />
             <Success />

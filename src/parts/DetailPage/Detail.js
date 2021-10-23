@@ -5,8 +5,8 @@ import { useGlobalContext } from "helpers/hooks/useGlobalContext";
 export default function Detail({ data }) {
   const [slider, setSlider] = React.useState(() => data?.imgUrls?.[0] || "");
 
-  const { state, dispatch } = useGlobalContext();
-  console.log(state, dispatch);
+  const { dispatch } = useGlobalContext();
+
   return (
     /* <!-- START: Details --> */
     <section className="container mx-auto">

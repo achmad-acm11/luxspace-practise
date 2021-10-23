@@ -106,8 +106,8 @@ export default function DetailPage() {
       <Breadcrumbs
         list={[
           { url: "/", name: "Home" },
-          { url: "/", name: "Office Room" },
-          { url: "/", name: "Details" },
+          { url: "/categories", name: "Office Room" },
+          { url: `/details/${productId}`, name: "Details" },
         ]}
       />
       {isError ? (

@@ -1,7 +1,54 @@
+import fetch from "helpers/fetch";
+import useAsync from "helpers/hooks/useAsync";
+import useForm from "helpers/hooks/useForm";
+import { useGlobalContext } from "helpers/hooks/useGlobalContext";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 export default function Cart() {
+  const history = useHistory();
+  const { data, run, isLoading } = useAsync();
+  const { state, dispatch } = useGlobalContext();
+
+  const { state: payload, fnUpdateState } = useForm({
+    completeName: "",
+    emailAddress: "",
+    address: "",
+    phoneNumber: "",
+    courier: "",
+    payment: "",
+  });
+  const isSubmitDisabled =
+    Object.keys(payload).filter((key) => {
+      return payload[key] !== "";
+    }).length === Object.keys(payload).length;
+
+  React.useEffect(() => {
+    run(fetch({ url: "/api/checkout/meta" }));
+  }, [run]);
+
+  async function fnSubmit(event) {
+    event.preventDefault();
+    try {
+      const res = await fetch({
+        url: "/api/checkout",
+        method: "POST",
+        body: JSON.stringify({
+          ...payload,
+          cart: Object.keys(state.cart).map((key) => state.cart[key]),
+        }),
+      });
+
+      if (res) {
+        history.push("/success");
+        dispatch({
+          type: "RESET_CART",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     /* <!-- START: Cart --> */
     <section className="md:py-16">
@@ -19,7 +66,7 @@ export default function Cart() {
             <div className="border-b border-gray-200 mb-4 hidden md:block">
               <div className="flex flex-start items-center pb-2 -mx-4">
                 <div className="px-4 flex-none">
-                  <div className="" style={{"width": "90px"}}>
+                  <div className="" style={{ width: "90px" }}>
                     <h6>Photo</h6>
                   </div>
                 </div>
@@ -41,161 +88,96 @@ export default function Cart() {
               </div>
             </div>
             {/* <!-- END: Table Title --> */}
+            {Object.keys(state.cart).length === 0 ? (
+              // <!-- START: Cart empty wrapper -->
+              <p id="cart-empty" className="text-center py-8">
+                Ooops... Cart is empty
+                <Link to="/details/1" className="underline">
+                  Shop Now!
+                </Link>
+              </p>
+            ) : (
+              // <!-- END: Cart empty wrapper -->
+              Object.keys(state.cart).map((key) => {
+                const item = state.cart[key];
 
-            {/* <!-- START: Cart empty wrapper --> */}
-            <p id="cart-empty" className="hidden text-center py-8">
-              Ooops... Cart is empty
-              <Link href="details/1" className="underline">
-                Shop Now!
-              </Link>
-            </p>
-            {/* <!-- END: Cart empty wrapper --> */}
-
-            {/* <!-- START: Table Item 1 --> */}
-            <div
-              className="flex flex-start flex-wrap items-center mb-4 -mx-4"
-              data-row="1"
-            >
-              <div className="px-4 flex-none">
-                <div className="" style={{"width": "90px","height": "90px"}}>
-                  <img
-                    src="/images/content/chair-office-1.jpg"
-                    alt="chair office 1"
-                  />
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 flex-1">
-                <div className="">
-                  <h6 className="font-semibold text-lg md:text-xl leading-8">
-                    Saman Kakka
-                  </h6>
-                  <span className="text-sm md:text-lg">Office Room</span>
-                  <h6 className="font-semibold text-base md:text-lg block md:hidden">
-                    IDR 28.000.000
-                  </h6>
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 flex-none md:flex-1 hidden md:block">
-                <div className="">
-                  <h6 className="font-semibold text-lg">IDR 29.000.000</h6>
-                </div>
-              </div>
-              <div className="px-4 w-2/12">
-                <div className="text-center">
-                  <button
-                    data-delete-item="1"
-                    className="text-red-600 border-none focus:outline-none px-3 py-1"
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-start flex-wrap items-center mb-4 -mx-4"
+                    data-row="1"
                   >
-                    X
-                  </button>
-                </div>
-              </div>
-            </div>
-            {/* <!-- END: Table Item 1 --> */}
-
-            {/* <!-- START: Table Item 2 --> */}
-            <div
-              className="flex flex-start flex-wrap items-center mb-4 -mx-4"
-              data-row="2"
-            >
-              <div className="px-4 flex-none">
-                <div className="" style={{"width": "90px", "height": "90px"}}>
-                  <img
-                    src="/images/content/chair-office-2.jpg"
-                    alt="chair office 3"
-                  />
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 flex-1">
-                <div className="">
-                  <h6 className="font-semibold text-lg md:text-xl leading-8">
-                    Green Seat
-                  </h6>
-                  <span className="text-sm md:text-lg">Office Room</span>
-                  <h6 className="font-semibold text-base md:text-lg block md:hidden">
-                    IDR 12.500.000
-                  </h6>
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 float-none md:flex-1 hidden md:block">
-                <div className="">
-                  <h6 className="font-semibold text-lg">IDR 21.500.000</h6>
-                </div>
-              </div>
-              <div className="px-4 w-2/12">
-                <div className="text-center">
-                  <button
-                    data-delete-item="2"
-                    className="text-red-600 border-none focus:outline-none px-3 py-1"
-                  >
-                    X
-                  </button>
-                </div>
-              </div>
-            </div>
-            {/* <!-- END: Table Item 2 --> */}
-
-            {/* <!-- START: Table Item 3 --> */}
-            <div
-              className="flex flex-start flex-wrap items-center mb-4 -mx-4"
-              data-row="3"
-            >
-              <div className="px-4 flex-none">
-                <div className="" style={{"width": "90px", "height": "90px"}}>
-                  <img
-                    src="/images/content/chair-office-3.jpg"
-                    alt="chair office 3"
-                  />
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 flex-1">
-                <div className="">
-                  <h6 className="font-semibold text-lg md:text-xl leading-8">
-                    Pasific
-                  </h6>
-                  <span className="text-sm md:text-lg">Office Room</span>
-                  <h6 className="font-semibold text-base md:text-lg block md:hidden">
-                    IDR 88.000.000
-                  </h6>
-                </div>
-              </div>
-              <div className="px-4 w-auto md:w-5/12 float-none md:flex-1 hidden md:block">
-                <div className="">
-                  <h6 className="font-semibold text-lg">IDR 88.000.000</h6>
-                </div>
-              </div>
-              <div className="px-4 w-2/12">
-                <div className="text-center">
-                  <button
-                    data-delete-item="3"
-                    className="text-red-600 border-none focus:outline-none px-3 py-1"
-                  >
-                    X
-                  </button>
-                </div>
-              </div>
-            </div>
-            {/* <!-- END: Table Item 3 --> */}
+                    <div className="px-4 flex-none">
+                      <div
+                        className=""
+                        style={{ width: "90px", height: "90px" }}
+                      >
+                        <img
+                          src={`/images/content/${item.imgUrls[0]}`}
+                          alt={item.title}
+                        />
+                      </div>
+                    </div>
+                    <div className="px-4 w-auto md:w-5/12 flex-1">
+                      <div className="">
+                        <h6 className="font-semibold text-lg md:text-xl leading-8">
+                          {item.title}
+                        </h6>
+                        <span className="text-sm md:text-lg">
+                          {item.category.title}
+                        </span>
+                        <h6 className="font-semibold text-base md:text-lg block md:hidden">
+                          IDR {item.price}
+                        </h6>
+                      </div>
+                    </div>
+                    <div className="px-4 w-auto md:w-5/12 flex-none md:flex-1 hidden md:block">
+                      <div className="">
+                        <h6 className="font-semibold text-lg">
+                          IDR {item.price}
+                        </h6>
+                      </div>
+                    </div>
+                    <div className="px-4 w-2/12">
+                      <div className="text-center">
+                        <button
+                          onClick={() =>
+                            dispatch({
+                              type: "REMOVE_FROM_CART",
+                              id: item.id,
+                            })
+                          }
+                          className="text-red-600 border-none focus:outline-none px-3 py-1"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
           {/* <!-- END: shipping cart --> */}
 
           {/* <!-- START: shipping details --> */}
           <div className="w-full md:px-4 md:w-4/12" id="shipping-detail">
             <div className="bg-gray-100 px-4 py-6 md:p-8 md:rounded-3xl">
-              <form action="success.html">
+              <form onSubmit={fnSubmit}>
                 <div className="flex flex-start mb-6">
                   <h3 className="text-2xl">Shipping Details</h3>
                 </div>
 
                 {/* <!-- START: input complete name --> */}
                 <div className="flex flex-col mb-4">
-                  <label for="complete-name" className="text-sm mb-2">
+                  <label htmlFor="complete-name" className="text-sm mb-2">
                     Complete Name
                   </label>
                   <input
-                    data-input
+                    onChange={fnUpdateState}
+                    value={payload.completeName}
                     type="text"
-                    name=""
+                    name="completeName"
                     id="complete-name"
                     className="border border-gray-200 rounded-lg px-4 py-2 bg-white text-sm focus:border-blue-200 focus:outline-none"
                     placeholder="Input Your Name"
@@ -205,13 +187,14 @@ export default function Cart() {
 
                 {/* <!-- START: input email address --> */}
                 <div className="flex flex-col mb-4">
-                  <label for="email-address" className="text-sm mb-2">
+                  <label htmlFor="email-address" className="text-sm mb-2">
                     Email Address
                   </label>
                   <input
-                    data-input
+                    onChange={fnUpdateState}
+                    value={payload.emailAddress}
                     type="email"
-                    name=""
+                    name="emailAddress"
                     id="email-address"
                     className="border border-gray-200 rounded-lg px-4 py-2 bg-white text-sm focus:border-blue-200 focus:outline-none"
                     placeholder="Input Your Email Address"
@@ -221,13 +204,14 @@ export default function Cart() {
 
                 {/* <!-- START: input address --> */}
                 <div className="flex flex-col mb-4">
-                  <label for="address" className="text-sm mb-2">
+                  <label htmlFor="address" className="text-sm mb-2">
                     Address
                   </label>
                   <input
-                    data-input
+                    onChange={fnUpdateState}
+                    value={payload.address}
                     type="text"
-                    name=""
+                    name="address"
                     id="address"
                     className="border border-gray-200 rounded-lg px-4 py-2 bg-white text-sm focus:border-blue-200 focus:outline-none"
                     placeholder="Input Your Address"
@@ -237,13 +221,14 @@ export default function Cart() {
 
                 {/* <!-- START: input phone number --> */}
                 <div className="flex flex-col mb-4">
-                  <label for="phone-number" className="text-sm mb-2">
+                  <label htmlFor="phone-number" className="text-sm mb-2">
                     Phone Number
                   </label>
                   <input
-                    data-input
+                    onChange={fnUpdateState}
+                    value={payload.phoneNumber}
                     type="tel"
-                    name=""
+                    name="phoneNumber"
                     id="phone-number"
                     className="border border-gray-200 rounded-lg px-4 py-2 bg-white text-sm focus:border-blue-200 focus:outline-none"
                     placeholder="Input Your Phone Number"
@@ -256,35 +241,48 @@ export default function Cart() {
                   <label className="text-sm mb-2">Choose Courier</label>
 
                   <div className="flex -mx-2 flex-wrap">
-                    {/* <!-- START: courier 1 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/courier/logo-fedex.png"
-                          alt="fedex"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: courier 1 --> */}
-
-                    {/* <!-- START: courier 2 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/courier/logo-dhl.png"
-                          alt="fedex"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: courier 2 --> */}
+                    {isLoading
+                      ? Array(2)
+                          .fill()
+                          .map((_, index) => {
+                            return (
+                              <div
+                                key={`Courier${index}`}
+                                className="px-2 w-6/12 h-24 mb-4"
+                              >
+                                <div className="bg-gray-300 w-full h-full animate-pulse rounded-lg mx-2"></div>
+                              </div>
+                            );
+                          })
+                      : data.couriers.map((item) => {
+                          // <!-- START: courier 1 -->
+                          return (
+                            <div
+                              key={`courier${item.id}`}
+                              className="px-2 w-6/12 h-24 mb-4"
+                            >
+                              <button
+                                onClick={() => {
+                                  fnUpdateState({
+                                    target: {
+                                      name: "courier",
+                                      value: item.id,
+                                    },
+                                  });
+                                }}
+                                type="button"
+                                className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
+                              >
+                                <img
+                                  src={`/images/content/courier/${item.imgUrl}`}
+                                  alt={item.name}
+                                  className="object-contain max-h-full"
+                                />
+                              </button>
+                            </div>
+                          );
+                          // <!-- END: courier 1 -->
+                        })}
                   </div>
                 </div>
                 {/* <!-- END: Choose courier --> */}
@@ -294,73 +292,50 @@ export default function Cart() {
                   <label className="text-sm mb-2">Choose Payment</label>
 
                   <div className="flex -mx-2 flex-wrap">
-                    {/* <!-- START: payment 1 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        data-value="midtrans"
-                        data-name="payment"
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/payment/logo-midtrans.png"
-                          alt="midtrans"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: payment 1 --> */}
-
-                    {/* <!-- START: payment 2 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        data-value="mastercard"
-                        data-name="payment"
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/payment/logo-mastercard.png"
-                          alt="mastercard"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: payment 2 --> */}
-
-                    {/* <!-- START: payment 3 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        data-value="bitcoin"
-                        data-name="payment"
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/payment/logo-bitcoin.png"
-                          alt="bitcoin"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: payment 3 --> */}
-
-                    {/* <!-- START: payment 4 --> */}
-                    <div className="px-2 w-6/12 h-24 mb-4">
-                      <button
-                        data-value="american-express"
-                        data-name="payment"
-                        type="button"
-                        className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
-                      >
-                        <img
-                          src="/images/content/payment/logo-american-express.png"
-                          alt="american-express"
-                          className="object-contain max-h-full"
-                        />
-                      </button>
-                    </div>
-                    {/* <!-- END: payment 4 --> */}
+                    {isLoading
+                      ? Array(4)
+                          .fill()
+                          .map((_, index) => {
+                            return (
+                              <div
+                                key={`Paymant${index}`}
+                                className="px-2 w-6/12 h-24 mb-4"
+                              >
+                                <div className="bg-gray-300 w-full h-full animate-pulse rounded-lg mx-2"></div>
+                              </div>
+                            );
+                          })
+                      : data.payments.map((item) => {
+                          return (
+                            //  <!-- START: payment 1 -->
+                            <div
+                              key={`payment${item.id}`}
+                              className="px-2 w-6/12 h-24 mb-4"
+                            >
+                              <button
+                                onClick={() => {
+                                  fnUpdateState({
+                                    target: {
+                                      name: "payment",
+                                      value: item.id,
+                                    },
+                                  });
+                                }}
+                                data-value="midtrans"
+                                data-name="payment"
+                                type="button"
+                                className="border border-gray-200 focus:outline-none focus:border-red-200 flex items-center justify-center rounded-xl bg-white w-full h-full"
+                              >
+                                <img
+                                  src={`/images/content/payment/${item.imgUrl}`}
+                                  alt={item.name}
+                                  className="object-contain max-h-full"
+                                />
+                              </button>
+                            </div>
+                            //  <!-- END: payment 1 -->
+                          );
+                        })}
                   </div>
                 </div>
                 {/* <!-- END: payment --> */}
@@ -368,7 +343,7 @@ export default function Cart() {
                 <div className="text-center">
                   <button
                     type="submit"
-                    disabled
+                    disabled={!isSubmitDisabled}
                     className="bg-pink-400 text-black focus:bg-black focus:outline-none w-full py-3 rounded-full text-lg focus:text-pink-400 transition-all duration-200 px-6"
                   >
                     Checkout Now

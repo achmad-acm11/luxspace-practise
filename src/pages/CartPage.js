@@ -5,13 +5,14 @@ import Header from 'parts/Header'
 import React from 'react'
 
 export default function CartPage() {
+    
     return (
         <>
             <Header />
             <Breadcrumbs list={
                 [
                     {"url":"/", "name":"Home"},
-                    {"url":"/", "name":"Shopping Cart"}
+                    {"url":"/cart", "name":"Shopping Cart"}
                 ]
             } />
             <Cart />
