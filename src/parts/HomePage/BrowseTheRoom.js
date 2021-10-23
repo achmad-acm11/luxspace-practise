@@ -2,6 +2,7 @@ import useAsync from "helpers/hooks/useAsync";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import fetch from "helpers/fetch";
+import "helpers/format/thousand";
 
 function Loading({ ratio = {} }) {
   const dummy = [
@@ -38,9 +39,9 @@ function Loading({ ratio = {} }) {
     return (
       <div
         key={item.id}
-        className={`relative ${
-          ratio?.wrapper.default?.[item.ratio.default]
-        } ${ratio?.wrapper.md?.[item.ratio.md]} card`}
+        className={`relative ${ratio?.wrapper.default?.[item.ratio.default]} ${
+          ratio?.wrapper.md?.[item.ratio.md]
+        } card`}
         style={{ height: index === 0 ? "180px" : "auto" }}
       >
         <div className="bg-gray-300 rounded-lg w-full h-full">
@@ -54,13 +55,11 @@ function Loading({ ratio = {} }) {
   });
 }
 export default function BrowseTheRoom() {
-  const { data, status, error, run, isLoading } = useAsync();
+  const { data, run, isLoading } = useAsync();
 
   useEffect(() => {
     run(fetch({ url: "/api/categories/?page=1&limit=4" }));
   }, [run]);
-
-  console.log(data, status, error);
 
   const ratioClassNames = {
     wrapper: {
@@ -120,7 +119,10 @@ export default function BrowseTheRoom() {
                     }`}
                   >
                     <h5 className="text-lg font-semibold">{item.title}</h5>
-                    <span className="">{item.products}  {item.products > 1 ? "items" : "item"}</span>
+                    <span className="">
+                      {item.products.thousand()}{" "}
+                      {item.products > 1 ? "items" : "item"}
+                    </span>
                   </div>
                   <Link to="/details" className="stretched-link"></Link>
                 </div>

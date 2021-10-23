@@ -3,6 +3,7 @@ import fetch from "helpers/fetch";
 import useAsync from "helpers/hooks/useAsync";
 import React, { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import "helpers/format/currency";
 
 function Loading() {
   return Array(6)
@@ -84,10 +85,8 @@ export default function JustArrived() {
                       className="w-full h-full object-cover object-center"
                     />
                   </div>
-                  <h5 className="text-lg font-semibold mt-4">
-                    {item.title}
-                  </h5>
-                  <span className="">IDR {item.price}</span>
+                  <h5 className="text-lg font-semibold mt-4">{item.title}</h5>
+                  <span className="">{item.price.currency()}</span>
                   <Link to="/" className="stretched-link"></Link>
                 </div>
               );

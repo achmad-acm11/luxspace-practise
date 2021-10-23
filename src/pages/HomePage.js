@@ -5,21 +5,17 @@ import BrowseTheRoom from "parts/HomePage/BrowseTheRoom";
 import Client from "parts/HomePage/Client";
 import JustArrived from "parts/HomePage/JustArrived";
 import React from "react";
-import useScrollAnchor from "helpers/hooks/useScrollAnchor";
-import useModalDOM from "helpers/hooks/useModalDOM";
-
+import Document from "parts/Document";
 
 export default function HomePage(props) {
-  useScrollAnchor();
-  useModalDOM();
   return (
-    <>
+    <Document>
       <Header position="absolute" />
       <Hero />
       <BrowseTheRoom />
       <JustArrived />
       <Client />
       <Footer />
-    </>
+    </Document>
   );
 }

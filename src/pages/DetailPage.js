@@ -3,6 +3,7 @@ import fetch from "helpers/fetch";
 import useAsync from "helpers/hooks/useAsync";
 import CompleteRoom from "parts/DetailPage/CompleteRoom";
 import Detail from "parts/DetailPage/Detail";
+import Document from "parts/Document";
 import Footer from "parts/Footer";
 import Header from "parts/Header";
 import React from "react";
@@ -99,9 +100,8 @@ export default function DetailPage() {
   React.useEffect(() => {
     run(fetch({ url: `/api/products/${productId}` }));
   }, [run, productId]);
-
   return (
-    <>
+    <Document>
       <Header theme="black" />
       <Breadcrumbs
         list={[
@@ -123,6 +123,6 @@ export default function DetailPage() {
         </>
       )}
       <Footer />
-    </>
+    </Document>
   );
 }
